@@ -16,5 +16,35 @@ CHIP Mux4Way16 {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    Not(in=sel[0], out=selx0);
+    Not(in=sel[1], out=sel0x);
+
+    And(a=selx0,  b=sel0x,  out=sel00);
+    And(a=sel[0], b=sel0x,  out=sel01);
+    And(a=selx0,  b=sel[1], out=sel10);
+    And(a=sel[0], b=sel[1], out=sel11);
+
+    And16(a=a, b[0]=sel00,  b[1]=sel00,  b[2]=sel00,  b[3]=sel00,
+               b[4]=sel00,  b[5]=sel00,  b[6]=sel00,  b[7]=sel00,
+               b[8]=sel00,  b[9]=sel00,  b[10]=sel00, b[11]=sel00,
+               b[12]=sel00, b[13]=sel00, b[14]=sel00, b[15]=sel00, out=asel00);
+
+    And16(a=b, b[0]=sel01,  b[1]=sel01,  b[2]=sel01,  b[3]=sel01,
+               b[4]=sel01,  b[5]=sel01,  b[6]=sel01,  b[7]=sel01,
+               b[8]=sel01,  b[9]=sel01,  b[10]=sel01, b[11]=sel01,
+               b[12]=sel01, b[13]=sel01, b[14]=sel01, b[15]=sel01, out=bsel01);
+
+    And16(a=c, b[0]=sel10,  b[1]=sel10,  b[2]=sel10,  b[3]=sel10,
+               b[4]=sel10,  b[5]=sel10,  b[6]=sel10,  b[7]=sel10,
+               b[8]=sel10,  b[9]=sel10,  b[10]=sel10, b[11]=sel10,
+               b[12]=sel10, b[13]=sel10, b[14]=sel10, b[15]=sel10, out=csel10);
+
+    And16(a=d, b[0]=sel11,  b[1]=sel11,  b[2]=sel11,  b[3]=sel11,
+               b[4]=sel11,  b[5]=sel11,  b[6]=sel11,  b[7]=sel11,
+               b[8]=sel11,  b[9]=sel11,  b[10]=sel11, b[11]=sel11,
+               b[12]=sel11, b[13]=sel11, b[14]=sel11, b[15]=sel11, out=dsel11);
+
+    Or16(a=asel00, b=bsel01, out=w1);
+    Or16(a=csel10, b=dsel11, out=w2);
+    Or16(a=w1,     b=w2,     out=out);
 }
