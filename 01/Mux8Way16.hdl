@@ -18,5 +18,75 @@ CHIP Mux8Way16 {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    Not(in=sel[0], out=selxx0);
+    Not(in=sel[1], out=selx0x);
+    Not(in=sel[2], out=sel0xx);
+
+    And(a=selx0x, b=sel0xx, out=sel00x);
+    And(a=sel0xx, b=selxx0, out=sel0x0);
+    And(a=selxx0, b=selx0x, out=selx00);
+
+    And(a=sel[1], b=sel0xx, out=sel01x);
+    And(a=sel[2], b=selx0x, out=sel10x);
+    And(a=sel[1], b=selxx0, out=selx10);
+    And(a=sel[0], b=sel[1], out=selx11);
+
+    And(a=selxx0, b=sel00x, out=sel000);
+    And(a=sel[0], b=sel00x, out=sel001);
+    And(a=sel[1], b=sel0x0, out=sel010);
+    And(a=sel[0], b=sel01x, out=sel011);
+    And(a=sel[2], b=selx00, out=sel100);
+    And(a=sel[0], b=sel10x, out=sel101);
+    And(a=sel[2], b=selx10, out=sel110);
+    And(a=sel[2], b=selx11, out=sel111);
+
+    And16(a=a, b[0]=sel000,  b[1]=sel000,  b[2]=sel000,  b[3]=sel000,
+               b[4]=sel000,  b[5]=sel000,  b[6]=sel000,  b[7]=sel000,
+               b[8]=sel000,  b[9]=sel000,  b[10]=sel000, b[11]=sel000,
+               b[12]=sel000, b[13]=sel000, b[14]=sel000, b[15]=sel000, out=asel000);
+
+    And16(a=b, b[0]=sel001,  b[1]=sel001,  b[2]=sel001,  b[3]=sel001,
+               b[4]=sel001,  b[5]=sel001,  b[6]=sel001,  b[7]=sel001,
+               b[8]=sel001,  b[9]=sel001,  b[10]=sel001, b[11]=sel001,
+               b[12]=sel001, b[13]=sel001, b[14]=sel001, b[15]=sel001, out=bsel001);
+
+    And16(a=c, b[0]=sel010,  b[1]=sel010,  b[2]=sel010,  b[3]=sel010,
+               b[4]=sel010,  b[5]=sel010,  b[6]=sel010,  b[7]=sel010,
+               b[8]=sel010,  b[9]=sel010,  b[10]=sel010, b[11]=sel010,
+               b[12]=sel010, b[13]=sel010, b[14]=sel010, b[15]=sel010, out=csel010);
+
+    And16(a=d, b[0]=sel011,  b[1]=sel011,  b[2]=sel011,  b[3]=sel011,
+               b[4]=sel011,  b[5]=sel011,  b[6]=sel011,  b[7]=sel011,
+               b[8]=sel011,  b[9]=sel011,  b[10]=sel011, b[11]=sel011,
+               b[12]=sel011, b[13]=sel011, b[14]=sel011, b[15]=sel011, out=dsel011);
+
+    And16(a=e, b[0]=sel100,  b[1]=sel100,  b[2]=sel100,  b[3]=sel100,
+               b[4]=sel100,  b[5]=sel100,  b[6]=sel100,  b[7]=sel100,
+               b[8]=sel100,  b[9]=sel100,  b[10]=sel100, b[11]=sel100,
+               b[12]=sel100, b[13]=sel100, b[14]=sel100, b[15]=sel100, out=esel100);
+
+    And16(a=f, b[0]=sel101,  b[1]=sel101,  b[2]=sel101,  b[3]=sel101,
+               b[4]=sel101,  b[5]=sel101,  b[6]=sel101,  b[7]=sel101,
+               b[8]=sel101,  b[9]=sel101,  b[10]=sel101, b[11]=sel101,
+               b[12]=sel101, b[13]=sel101, b[14]=sel101, b[15]=sel101, out=fsel101);
+
+    And16(a=g, b[0]=sel110,  b[1]=sel110,  b[2]=sel110,  b[3]=sel110,
+               b[4]=sel110,  b[5]=sel110,  b[6]=sel110,  b[7]=sel110,
+               b[8]=sel110,  b[9]=sel110,  b[10]=sel110, b[11]=sel110,
+               b[12]=sel110, b[13]=sel110, b[14]=sel110, b[15]=sel110, out=gsel110);
+
+    And16(a=h, b[0]=sel111,  b[1]=sel111,  b[2]=sel111,  b[3]=sel111,
+               b[4]=sel111,  b[5]=sel111,  b[6]=sel111,  b[7]=sel111,
+               b[8]=sel111,  b[9]=sel111,  b[10]=sel111, b[11]=sel111,
+               b[12]=sel111, b[13]=sel111, b[14]=sel111, b[15]=sel111, out=hsel111);
+
+    Or16(a=asel000, b=bsel001, out=wab);
+    Or16(a=csel010, b=dsel011, out=wcd);
+    Or16(a=esel100, b=fsel101, out=wef);
+    Or16(a=gsel110, b=hsel111, out=wgh);
+
+    Or16(a=wab, b=wcd, out=w1);
+    Or16(a=wef, b=wgh, out=w2);
+
+    Or16(a=w1, b=w2, out=out);
 }
