@@ -42,6 +42,7 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
+    // zx
     Not(in=zx, out=notZX);
     And16(a[0]=notZX,  a[1]=notZX,  a[2]=notZX,  a[3]=notZX,
           a[4]=notZX,  a[5]=notZX,  a[6]=notZX,  a[7]=notZX,
@@ -49,6 +50,8 @@ CHIP ALU {
           a[12]=notZX, a[13]=notZX, a[14]=notZX, a[15]=notZX,
           b=x,
           out=x1);
+
+    // nx
     Xor16(a[0]=nx,  a[1]=nx,  a[2]=nx,  a[3]=nx,
           a[4]=nx,  a[5]=nx,  a[6]=nx,  a[7]=nx,
           a[8]=nx,  a[9]=nx,  a[10]=nx, a[11]=nx,
@@ -56,6 +59,7 @@ CHIP ALU {
           b=x1,
           out=x2);
 
+    // zy
     Not(in=zy, out=notZY);
     And16(a[0]=notZY,  a[1]=notZY,  a[2]=notZY,  a[3]=notZY,
           a[4]=notZY,  a[5]=notZY,  a[6]=notZY,  a[7]=notZY,
@@ -63,6 +67,8 @@ CHIP ALU {
           a[12]=notZY, a[13]=notZY, a[14]=notZY, a[15]=notZY,
           b=y,
           out=y1);
+
+    // ny
     Xor16(a[0]=ny,  a[1]=ny,  a[2]=ny,  a[3]=ny,
           a[4]=ny,  a[5]=ny,  a[6]=ny,  a[7]=ny,
           a[8]=ny,  a[9]=ny,  a[10]=ny, a[11]=ny,
@@ -70,15 +76,22 @@ CHIP ALU {
           b=y1,
           out=y2);
 
+    // f
+    Add16(a=x2, b=y2, out=plusOut);
     And16(a=x2, b=y2, out=andOut);
-    Add16(a=x2, b=y2, out=addOut);
+    Mux16(a=andOut, b=plusOut, sel=f, out=mxOut);
 
-    Mux16(a=andOut, b=addOut, sel=f, out=mxOut);
-
+    // no, ng
     Xor16(a[0]=no,  a[1]=no,  a[2]=no,  a[3]=no,
           a[4]=no,  a[5]=no,  a[6]=no,  a[7]=no,
           a[8]=no,  a[9]=no,  a[10]=no, a[11]=no,
           a[12]=no, a[13]=no, a[14]=no, a[15]=no,
           b=mxOut,
-          out=out);
+          out=out,
+          out=wo,
+          out[15]=ng);
+
+    // zr
+    Or16Way(in=wo, out=or16out);
+    Not(in=or16out, out=zr);
 }
