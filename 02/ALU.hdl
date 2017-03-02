@@ -42,56 +42,27 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-    // zx
-    Not(in=zx, out=notZX);
-    And16(a[0]=notZX,  a[1]=notZX,  a[2]=notZX,  a[3]=notZX,
-          a[4]=notZX,  a[5]=notZX,  a[6]=notZX,  a[7]=notZX,
-          a[8]=notZX,  a[9]=notZX,  a[10]=notZX, a[11]=notZX,
-          a[12]=notZX, a[13]=notZX, a[14]=notZX, a[15]=notZX,
-          b=x,
-          out=x1);
+    // zx, nx
+    Not16(in=x, out=notX);
+    Mux4Way16(a=x, b=notX, c=false, d=true, sel[0]=nx, sel[1]=zx, out=zxnx);
 
-    // nx
-    Xor16(a[0]=nx,  a[1]=nx,  a[2]=nx,  a[3]=nx,
-          a[4]=nx,  a[5]=nx,  a[6]=nx,  a[7]=nx,
-          a[8]=nx,  a[9]=nx,  a[10]=nx, a[11]=nx,
-          a[12]=nx, a[13]=nx, a[14]=nx, a[15]=nx,
-          b=x1,
-          out=x2);
-
-    // zy
-    Not(in=zy, out=notZY);
-    And16(a[0]=notZY,  a[1]=notZY,  a[2]=notZY,  a[3]=notZY,
-          a[4]=notZY,  a[5]=notZY,  a[6]=notZY,  a[7]=notZY,
-          a[8]=notZY,  a[9]=notZY,  a[10]=notZY, a[11]=notZY,
-          a[12]=notZY, a[13]=notZY, a[14]=notZY, a[15]=notZY,
-          b=y,
-          out=y1);
-
-    // ny
-    Xor16(a[0]=ny,  a[1]=ny,  a[2]=ny,  a[3]=ny,
-          a[4]=ny,  a[5]=ny,  a[6]=ny,  a[7]=ny,
-          a[8]=ny,  a[9]=ny,  a[10]=ny, a[11]=ny,
-          a[12]=ny, a[13]=ny, a[14]=ny, a[15]=ny,
-          b=y1,
-          out=y2);
+    // zy, ny
+    Not16(in=y, out=notY);
+    Mux4Way16(a=y, b=notY, c=false, d=true, sel[0]=ny, sel[1]=zy, out=zyny);
 
     // f
-    Add16(a=x2, b=y2, out=plusOut);
-    And16(a=x2, b=y2, out=andOut);
-    Mux16(a=andOut, b=plusOut, sel=f, out=mxOut);
+    Add16(a=zxnx, b=zyny, out=plusOut);
+    And16(a=zxnx, b=zyny, out=andOut);
+    Mux16(a=andOut, b=plusOut, sel=f, out=fOut);
 
     // no, ng
-    Xor16(a[0]=no,  a[1]=no,  a[2]=no,  a[3]=no,
-          a[4]=no,  a[5]=no,  a[6]=no,  a[7]=no,
-          a[8]=no,  a[9]=no,  a[10]=no, a[11]=no,
-          a[12]=no, a[13]=no, a[14]=no, a[15]=no,
-          b=mxOut,
-          out=out,
-          out=wo,
-          out[15]=ng);
+    Not16(in=fOut, out=nfOut);
+    Mux16(a=fOut, b=nfOut, sel=no, out=out,
+          out[15]=ng, out[0..7]=l, out[8..15]=h);
 
     // zr
-    Or16Way(in=wo, out=or16out);
-    Not(in=or16out, out=zr);
+    Or8Way(in=l, out=low);
+    Or8Way(in=h, out=high);
+    Or(a=low, b=high, out=t);
+    Not(in=t, out=zr);
 }
