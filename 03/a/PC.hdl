@@ -16,12 +16,10 @@ CHIP PC {
     OUT out[16];
 
     PARTS:
-    Mux8Way16(a=mem,
-              b=plus,
-              c=in, d=in,
-              e=false, f=false, g=false, h=false,
-              sel[0]=inc, sel[1]=load, sel[2]=reset,
-              out=muxOut);
-    Register(in=muxOut, load=true, out=out, out=mem, out=addend);
-    Inc16(in=addend, out=plus);
+    Mux16(a=prev, b=prevPlus, sel=inc,   out=mux1);
+    Mux16(a=mux1, b=in,       sel=load,  out=mux2);
+    Mux16(a=mux2, b=false,    sel=reset, out=mux3);
+
+    Register(in=mux3, load=true, out=out, out=prev);
+    Inc16(in=prev, out=prevPlus);
 }
