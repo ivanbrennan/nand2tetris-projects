@@ -13,15 +13,18 @@
 
       @SCREEN     // point at SCREEN
       D=A         // jot down its address
-      @screenword
-      M=D         // store it in screenword
-
       @maxword
       M=D         // store it in maxword
-      @8191       // A = (32 * 256) - 1
+      @8191       // (32 * 256) - 1
       D=A         // jot down number of additional registers in screen
       @maxword
       M=M+D       // add it to maxword
+
+(RESET)
+      @SCREEN     // point at SCREEN
+      D=A         // jot down its address
+      @screenword
+      M=D         // store it in screenword
 
 (LOOP)
       @KBD
@@ -61,12 +64,3 @@
       M=M+1       // otherwise, increment screenword
       @LOOP
       0;JEQ       // and repeat
-
-(RESET)
-      @SCREEN     // point at SCREEN
-      D=A         // jot down its address
-      @screenword
-      M=D         // store it in screenword
-
-      @LOOP
-      0;JEQ
