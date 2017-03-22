@@ -28,7 +28,7 @@
       M=M-1
 
       @LOOP
-      0;JEQ
+      0;JMP
 
 (END)
       @END
