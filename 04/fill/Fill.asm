@@ -11,64 +11,62 @@
 // "white" in every pixel;
 // the screen should remain fully clear as long as no key is pressed.
 
-// screenword = SCREEN
-      @SCREEN
-      D=A
+      @SCREEN     // point at SCREEN
+      D=A         // jot down its address
       @screenword
-      M=D
+      M=D         // store it in screenword
 
-// maxword = SCREEN + 8192
-      @SCREEN
-      D=A
       @maxword
-      M=D
-      @8192
-      D=A-1
+      M=D         // store it in maxword
+      @8191       // A = (32 * 256) - 1
+      D=A         // jot down number of additional registers in screen
       @maxword
-      M=M+D
+      M=M+D       // add it to maxword
 
-// while true
 (LOOP)
-      @KBD   // if keyboard == 0
-      D=M
-      @WHITE // draw white
-      D;JEQ
-      @BLACK // else draw black
-      0;JEQ
+      @KBD
+      D=M         // read from keyboard
+
+      @WHITE
+      D;JEQ       // if keyboard == 0, draw white
+
+      @BLACK
+      0;JEQ       // else draw black
 
 (WHITE)
-      @screenword
-      A=M
-      M=0
+      @screenword // read screenword
+      A=M         // point at the address it references
+      M=0         // set that register to 00...0
+
       @INCREMENT
       0;JEQ
 
 (BLACK)
-      @screenword
-      A=M
-      M=-1
+      @screenword // read screenword
+      A=M         // point at the address it references
+      M=-1        // set that register to 11...1
+
       @INCREMENT
       0;JEQ
 
 (INCREMENT)
-      @maxword
-      D=M
-      @screenword
-      D=D-M
+      @maxword    // read maxword
+      D=M         // jot down its value
+      @screenword // read screenword
+      D=D-M       // subtract the two values
       @RESET
-      D;JEQ // reset if maxword - screenword == 0
+      D;JEQ       // reset if screenword == maxword
 
       @screenword
-      M=M+1 // screenword += 1
-
+      M=M+1       // otherwise, increment screenword
       @LOOP
-      0;JEQ
+      0;JEQ       // and repeat
 
 (RESET)
-      @SCREEN
-      D=A
+      @SCREEN     // point at SCREEN
+      D=A         // jot down its address
       @screenword
-      M=D
+      M=D         // store it in screenword
 
       @LOOP
       0;JEQ
