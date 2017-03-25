@@ -39,5 +39,73 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+        // Instruction type (A/C)
+        Not(in=instruction[15], out=aInst);
+
+
+        // A-input: either an ALU result or an @address in the instruction
+        Mux16(a=outALU, b=instruction, sel=aInst, out=inA);
+
+        // A-load: if an A-instruction or the d1 destination bit is set
+        Or(a=aInst, b=instruction[5], out=loadA);
+
+        // A-output: address in RAM and fan-out to other internal CPU components
+        ARegister(in=inA, load=loadA, out[0..14]=addressM, out=outA);
+
+
+        // The "a" bit determines whether we use A or M (RAM[A])
+        Mux16(a=outA, b=inM, sel=instruction[12], out=mxAM);
+
+
+        // The d3 bit determines whether we write the result of an
+        // ALU computation to memory when executing a C-instruction.
+        And(a=instruction[15], b=instruction[3], out=writeM);
+
+
+        // Jump bits j1, j2, j3 determine whether we jump upon
+        // computing a negative, zero, or positive ALU result
+        And(a=instruction[15], b=instruction[2], out=j1);
+        And(a=instruction[15], b=instruction[1], out=j2);
+        And(a=instruction[15], b=instruction[0], out=j3);
+
+        And(a=j1, b=ng,  out=negJump);
+        And(a=j2, b=zr,  out=zeroJump);
+        And(a=j3, b=pos, out=posJump);
+
+        Not(in=zr, out=nzr);
+        Not(in=ng, out=ngn);
+        And(a=ngn, b=nzr, out=pos);
+
+        Or(a=negJump, b=zeroJump, out=negOrZeroJump);
+        Or(a=negOrZeroJump, b=posJump, out=jump);
+
+
+        // If a jump should occur, load the value of the A register,
+        // a ROM address from which we'll read the next instruction.
+        // If no jump, increment the current counter in order to read
+        // the subsequent instruction in ROM.
+        PC(in=outA, load=jump, inc=true, reset=reset, out[0..14]=pc);
+
+
+        // The d2 bit determines whether we write the result of an
+        // ALU computation to D when executing a C-instruction.
+        And(a=instruction[15], b=instruction[4], out=loadD);
+
+        DRegister(in=outALU, load=loadD, out=outD);
+
+
+        // Bits c1–c6 control which computation ALU performs
+        ALU(x=outD,
+            zx=instruction[11], // c1
+            nx=instruction[10], // c2
+            y=mxAM,
+            zy=instruction[9],  // c3
+            ny=instruction[8],  // c4
+            f=instruction[7],   // c5
+            no=instruction[6],  // c6
+            out=outM,
+            out=dIn,
+            out=outALU,
+            zr=zr,
+            ng=ng);
 }
